@@ -8,17 +8,48 @@ let todos = [];
 
 const handleClick = (event) => {
     const itemKey = event.target.parentElement.dataset.id;
-    if(event.target.type == 'submit') {
+    if(event.target.type === 'submit') {
         todos = todos.filter(todo => todo.id !== parseInt(itemKey));
-        renderTodos();
+        renderTodo();
     }
-    if(event.target.type == 'checkbox') {
+    if(event.target.type === 'checkbox') {
         todos.forEach(todo => {
             if (todo.id === parseInt(itemKey)) {
                 todo.isCompleted = event.target.checked;
             }
         });
-        renderTodos();
+        renderTodo();
+    }
+    if (event.detail === 2 && event.target.tagName === "SPAN") {
+        event.target.previousElementSibling.hidden = false;
+        event.srcElement.hidden = true;
+    }
+}
+
+const saveTodoText = (event, itemKey) => {
+    todos.forEach(todo => {
+        if (todo.id === parseInt(itemKey)) {
+            todo.text = event.target.value;
+        }
+    });
+}
+
+const handleKeydownClick = (event) => {
+    if (event.key === "Escape") {
+        renderTodo();
+    }
+    if (event.key === "Enter") {
+        const itemKey = event.target.parentElement.dataset.id;
+        saveTodoText(event, itemKey);
+        renderTodo();
+    }
+}
+
+const handleBlur = (event) => {
+    const itemKey = event.target.parentElement.dataset.id;
+    if(event.sourceCapabilities) {
+        saveTodoText(event, itemKey);
+        renderTodo();
     }
 }
 
@@ -30,14 +61,13 @@ const handleCheckAllTodo = (event) => {
     todos.forEach(todo => {
         todo.isCompleted = event.target.checked;
         });
-    renderTodos();
+    renderTodo();
 }
 
 const handleDeleteAllCheckedTodo = () => {
-    console.log( checkAll.checked);
     checkAll.checked = false;
     todos = todos.filter(todo => !todo.isCompleted);
-    renderTodos();
+    renderTodo();
 }
 
 const addTodo = () => {
@@ -49,7 +79,7 @@ const addTodo = () => {
             isCompleted: false
         };
         todos.push(todo);
-        renderTodos();
+        renderTodo();
         todoInput.value = '';
     }
 }
@@ -61,21 +91,25 @@ const addTodoByEnter = (event) => {
     }
 }
 
-const renderTodos = () => {
+const renderTodo = () => {
     listItems = '';
     todos.forEach(todo => {
         listItems += `<li data-id="${todo.id}" class="list-group-item">
         <input type="checkbox" ${todo.isCompleted ? 'checked' : ''} /> 
+        <input value="${todo.text}" hidden/>
         <span>${todo.text}</span>
         <button class="delete-todo"> delete </button>
         </li>`;
     });
     todoList.innerHTML = listItems;
+
     handleConfirmIsAllChechk();
 }
 
 todoInput.addEventListener('keydown', addTodoByEnter);
 addTodoBtn.addEventListener('click', addTodo);
 todoList.addEventListener('click', handleClick);
+todoList.addEventListener('keydown', handleKeydownClick);
+todoList.addEventListener('blur', handleBlur, true);
 checkAll.addEventListener('click', handleCheckAllTodo);
 deleteAllCheckedTodoBtn.addEventListener('click', handleDeleteAllCheckedTodo);
