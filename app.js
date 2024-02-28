@@ -1,3 +1,12 @@
+const DOUBLE_CLICK = 2;
+const KEYDOWN_ESCAPE = "Escape";
+const KEYDOWN_ENTER = "Enter";
+const COUNT_OF_TODO_ON_PAGE = 5;
+const CURRENT_PAGE = 1;
+const INDEX_OF_ALL_TAB = 0;
+const INDEX_OF_ACTIVE_TAB = 1;
+const INDEX_OF_COMPLETED_TAB = 2;
+
 const todoInput = document.querySelector('#todoInput');
 const addTodoBtn = document.querySelector('#addTodo');
 const todoList = document.querySelector('#todoList');
@@ -5,6 +14,7 @@ const checkAll = document.querySelector('#checkAll');
 const deleteAllChecked = document.querySelector('#deleteAll');
 const tabButtons = document.querySelectorAll('#tabGroups .tablinks');
 const tabulation = document.querySelector("#tabGroups");
+const paginationList = document.querySelector('#paginationList');
 
 let todos = [];
 let filterType = 'all';
@@ -21,7 +31,7 @@ const handleClick = (event) => {
             }
         });
     }
-    if (event.detail === 2 && event.target.tagName === "SPAN") {
+    if (event.detail === DOUBLE_CLICK && event.target.tagName === "SPAN") {
         event.target.previousElementSibling.hidden = false;
         event.srcElement.hidden = true;
     }
@@ -38,10 +48,10 @@ const saveTodoText = (event, itemKey) => {
 }
 
 const handleKeydownClick = (event) => {
-    if (event.key === "Escape") {
+    if (event.key === KEYDOWN_ESCAPE) {
         renderTodo();
     }
-    if (event.key === "Enter") {
+    if (event.key === KEYDOWN_ENTER) {
         const itemKey = event.target.parentElement.dataset.id;
         saveTodoText(event, itemKey);
         renderTodo();
@@ -91,8 +101,7 @@ const addTodo = () => {
 }
 
 const addTodoByEnter = (event) => {
-    if (event.key === 'Enter') {
-        event.preventDefault();
+    if (event.key === KEYDOWN_ENTER) {
         addTodo();
     }
 }
@@ -102,9 +111,9 @@ const countTodo = () => {
     let completed = todos.filter(todo => todo.isCompleted).length;
     let active = all - completed;
 
-    tabButtons[0].textContent = `All(${all})`;
-    tabButtons[1].textContent = `Active(${active})`;
-    tabButtons[2].textContent = `Completed(${completed})`;
+    tabButtons[INDEX_OF_ALL_TAB].textContent = `All(${all})`;
+    tabButtons[INDEX_OF_ACTIVE_TAB].textContent = `Active(${active})`;
+    tabButtons[INDEX_OF_COMPLETED_TAB].textContent = `Completed(${completed})`;
 }
 
 const openTab = () => {
@@ -117,15 +126,25 @@ const openTab = () => {
     return todos;
 }
 
-const switchf = (event) => {
-    console.log(event.target.id)
+const sliceTodos = (event) => {
+    console.log(event.target.id);
+    let index = (event.target.id - 1) * COUNT_OF_TODO_ON_PAGE;
+    return todos.slice(index, index + 5);
+}
 
-    filterType = event.target.id;
+const createPaginationButtons = () => {
+    let listPages = '';
+    countOfPages = Math.ceil(todos.length / COUNT_OF_TODO_ON_PAGE);
+    for(let i = 1; i <= countOfPages; i++) {
+        listPages += `<button id="${i}" class="tablinks">${i}</button>`;
+    }
+    paginationList.innerHTML = listPages;
 }
 
 const renderTodo = () => {
     let filterTodo = openTab();
     let listItems = '';
+
     filterTodo.forEach(todo => {
         listItems += `<li data-id="${todo.id}" class="list-group-item">
         <input type="checkbox" ${todo.isCompleted ? 'checked' : ''} /> 
@@ -134,9 +153,16 @@ const renderTodo = () => {
         <button class="delete-todo"> delete </button>
         </li>`;
     });
+    
     todoList.innerHTML = listItems;
 
+    createPaginationButtons();
     handleConfirmIsAllChechk();
+}
+
+const switchFilterType = (event) => {
+    filterType = event.target.id;
+    renderTodo();
 }
 
 todoInput.addEventListener('keydown', addTodoByEnter);
@@ -146,4 +172,5 @@ todoList.addEventListener('keydown', handleKeydownClick);
 todoList.addEventListener('blur', handleBlur, true);
 checkAll.addEventListener('click', handleCheckAllTodo);
 deleteAllChecked.addEventListener('click', handleDeleteAllCheckedTodo);
-tabulation.addEventListener('click', switchf);
+tabulation.addEventListener('click', switchFilterType);
+paginationList.addEventListener('click', sliceTodos);
