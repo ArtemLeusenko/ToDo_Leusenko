@@ -1,71 +1,84 @@
 body {
-    font-family: 'Luminari', 'fantasy', cursive;
-    font-size: xx-large;
-    background-color: black;
-    text-align: center;
-  }
-  
-  h1 {
-    font-size: 5ch;
-    font-weight: 500;
-  }
-  
-  .container {
-    margin:0 auto;
-    position: fixed;
-    background-color: orange;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    height: 100vh;
-  }
-  
-  .completed {
-    text-decoration: line-through;
-  }
-  
-  .delete-all {
-    background-color: black;
-    border: none;
-    color: white;
-    margin-bottom: 25px;
-  }
-  
-  .delete-todo {
-    background-color: red;
-    border: none;
-    border-radius: 40%;
-  }
-  
-  #paginationList {
-    background-color: transparent;
-  }
-  
-  #paginationList .tablinks {
-    background-color: black;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    margin: 0 5px;
-    margin-bottom: 25px;
-  }
+  font-family: 'Luminari', 'fantasy', cursive;
+  font-size: large;
+  background-color: black;
+  text-align: center;
+}
 
-  #todoinput {
-    border-radius: 30%;
-  }
-  
-  #addTodo {
-    border: none;
-  }
-  
-  #tabGroups .tablinks {
-    border: none;
-    background-color: black;
-    color: white;
-    margin-bottom: 25px;
-  }
+h1 {
+  font-size: 5ch;
+  font-weight: 500;
+}
+
+.container {
+  margin:0 auto;
+  position: fixed;
+  background-color: orange;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 100vh;
+}
+
+.completed {
+  text-decoration: line-through;
+}
+
+.delete-all {
+  background-color: black;
+  border: none;
+  color: white;
+  margin-bottom: 25px;
+}
+
+.delete-todo {
+  font-size: small;
+  text-align: center;
+  background-color: red;
+  margin-left: auto;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+}
+
+.tab-links-pagination {
+  background-color: black;
+  color: white;
+}
+
+.active {
+  background-color: red;
+  color: white;
+}
+
+.text-on-todo {
+  margin-left: 20px;
+}
+
+#input {
+  margin-bottom: 25px;
+}
+
+#paginationList {
+  background-color: transparent;
+}
+
+#addTodo {
+  background-color: black;
+  color: white;
+  border: none;
+}
+
+#tabGroups .tab-links {
+  border: none;
+  background-color: black;
+  color: white;
+  margin-bottom: 25px;
+}
+
+#todoList {
+  margin-bottom: 25px;
+}

@@ -13,17 +13,21 @@
   <body>
     <div class="container">
       <h1>TodoJS App</h1>
-      <input id="todoInput" placeholder="Add a new todo" />
-      <button id="addTodo">add</button>
-      <input id="checkAll" type="checkBox">
-      <span>check all</span></input> 
+        <div id="input">
+            <input id="todoInput" placeholder="Add a new todo" />
+            <button id="addTodo">Add</button>
+        </div>
+        <div>
+            <input id="checkAll" type="checkBox">
+            <span>check all</span>
+        </div>
       <ul id="todoList" class="list-group mt-3"></ul>
       <div id="tabGroups" class="tab-groups">
-        <button id="all" class="tablinks">All(0)</button>
-        <button id="active" class="tablinks">Active(0)</button>
-        <button id="completed" class="tablinks">Completed(0)</button>
+        <button id="all" class="tab-links">All(0)</button>
+        <button id="active" class="tab-links">Active(0)</button>
+        <button id="completed" class="tab-links">Completed(0)</button>
       </div>
-      <div id="paginationList" class="tablinks"></div>
+      <div id="paginationList" class="tab-links-pagination"></div>
       <button id="deleteAll" class="delete-all" >Delete All</button>
     </div>
     <script src="app.js"></script>
