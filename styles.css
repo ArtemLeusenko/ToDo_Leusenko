@@ -21,6 +21,8 @@ h1 {
   left: 50%;
   transform: translate(-50%, -50%);
   height: 100vh;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 .completed {
@@ -42,6 +44,7 @@ h1 {
   border-radius: 50%;
   width: 20px;
   height: 20px;
+  line-height: 20px;
 }
 
 .tab-links-pagination {
@@ -56,6 +59,19 @@ h1 {
 
 .text-on-todo {
   margin-left: 20px;
+}
+
+.text-on-todo-hidden {
+  width: 750px;
+  margin-left: 20px;
+}
+
+.list-group-item {
+  display: flex;
+  align-items: center;
+  flex: 1; 
+  word-wrap: break-word; 
+  width: 850px;
 }
 
 #input {
