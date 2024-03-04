@@ -1,0 +1,15 @@
+{
+    "env": {
+        "browser": true,
+        "es2023": true,
+        "jquery": true
+    },
+    "extends": "airbnb-base",
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "rules": {
+        "linebreak-style": 0,
+        "no-param-reassign": 0
+    }
+}

@@ -2,9 +2,6 @@ const DOUBLE_CLICK = 2;
 const KEYDOWN_ESCAPE = 'Escape';
 const KEYDOWN_ENTER = 'Enter';
 const COUNT_OF_TODO_ON_PAGE = 5;
-const INDEX_OF_ALL_TAB = 0;
-const INDEX_OF_ACTIVE_TAB = 1;
-const INDEX_OF_COMPLETED_TAB = 2;
 
 const todoInput = document.querySelector('#todoInput');
 const addTodoBtn = document.querySelector('#addTodo');
@@ -20,67 +17,101 @@ let filterType = 'all';
 let currentPage = 1;
 
 const escapeHTML = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-.replace(/'/g, '&#039;');
+  .replace(/'/g, '&#039;');
 
-const handleClick = (event) => {
-  const itemKey = event.target.parentElement.dataset.id;
-  if (event.target.type === 'submit') {
-    todos = todos.filter((todo) => todo.id !== parseInt(itemKey, 10));
-    returnBack();
-    renderTodo();
-  }
-  if (event.target.type === 'checkbox') {
-    todos.forEach((todo) => {
-      if (todo.id === parseInt(itemKey, 10)) {
-        todo.isCompleted = event.target.checked;
-      }
-    });
-    renderTodo();
-  }
-  if (event.detail === DOUBLE_CLICK && event.target.tagName === 'SPAN') {
-    event.target.previousElementSibling.hidden = false;
-    event.srcElement.hidden = true;
-  }
-  countTodo();
-}
+const setColor = () => {
+  // tabButtons.forEach((tab) => {
+  //   tab.style.backgroundColor = 'black';
+  // });
+  tabButtons.forEach((button) => {
+    button.classList.remove('tab-links');
+    if (button.id === filterType) {
+      button.classList.add('tab-links-a');
+    }
+  });
+};
 
-const handleKeydownClick = (event) => {
-  if (event.key === KEYDOWN_ESCAPE) {
-    renderTodo();
-  }
-  if (event.key === KEYDOWN_ENTER) {
-    const itemKey = event.target.parentElement.dataset.id;
-    saveTodoText(event, itemKey);
-    renderTodo();
-  }
-}
+const openTab = () => {
+  setColor();
 
-const handleBlur = (event) => {
-  const itemKey = event.target.parentElement.dataset.id;
-  if (event.sourceCapabilities) {
-    saveTodoText(event, itemKey);
-    renderTodo();
+  if (filterType === 'active') {
+    return todos.filter((todo) => !todo.isCompleted);
   }
-}
+  if (filterType === 'completed') {
+    return todos.filter((todo) => todo.isCompleted);
+  }
+
+  return todos;
+};
+
+const sliceTodos = () => {
+  const filterTodo = openTab();
+  const end = currentPage * COUNT_OF_TODO_ON_PAGE;
+  const start = end - COUNT_OF_TODO_ON_PAGE;
+  return filterTodo.slice(start, end);
+};
+
+const createPaginationButtons = () => {
+  let listPages = '';
+  const currentTodo = openTab();
+  const countOfPages = Math.ceil(currentTodo.length / COUNT_OF_TODO_ON_PAGE);
+  for (let i = 1; i <= countOfPages; i += 1) {
+    listPages += `<button id="${i}" class="tab-links-pagination ${currentPage === i ? 'active' : ''}"
+  style="border-radius: 50%; width: 50px; height: 50px; margin: 0 5px 25px;">${i}</button>`;
+  }
+  paginationList.innerHTML = listPages;
+};
+
+const countTodo = () => {
+  const all = todos.length;
+  const completed = todos.filter((todo) => todo.isCompleted).length;
+  const active = all - completed;
+
+  tabButtons[0].innerText = `All(${all})`;
+  tabButtons[1].innerText = `Active(${active})`;
+  tabButtons[2].innerText = `Completed(${completed})`;
+};
 
 const handleConfirmIsAllCheck = () => {
   checkAll.checked = todos.length ? todos.every((todo) => todo.isCompleted) : false;
-}
+};
 
-const handleCheckAllTodo = (event) => {
-  todos.forEach(todo => {
-    todo.isCompleted = event.target.checked;
+const renderTodo = () => {
+  let listItems = '';
+  const todosForRender = sliceTodos();
+
+  todosForRender.forEach((todo) => {
+    listItems += `<li data-id="${todo.id}" class="list-group-item" >
+                    <input type="checkbox" ${todo.isCompleted ? 'checked' : ''} />
+                    <input class="text-on-todo-hidden" value="${todo.text}" hidden/>
+                    <span class="text-on-todo">${todo.text}</span>
+                    <button class="delete-todo">✗</button>
+                  </li>`;
   });
-  countTodo();
-  renderTodo();
-}
+  todoList.innerHTML = listItems;
 
-const handleDeleteAllCheckedTodo = () => {
-  checkAll.checked = false;
-  todos = todos.filter(todo => !todo.isCompleted);
-  countTodo();
-  renderTodo(todos);
-}
+  createPaginationButtons();
+  handleConfirmIsAllCheck();
+  returnBack();
+};
+
+const returnBack = () => {
+  const currentTodo = openTab();
+  const countOfPages = Math.ceil(currentTodo.length / COUNT_OF_TODO_ON_PAGE);
+  if (currentPage > countOfPages && currentPage > 1) {
+    currentPage -= 1;
+    renderTodo();
+  }
+};
+
+const pushFront = () => {
+  const currentTodo = openTab();
+  const countOfPages = Math.ceil(currentTodo.length / COUNT_OF_TODO_ON_PAGE);
+  if (currentPage < countOfPages) {
+    currentPage += 1;
+    renderTodo();
+  }
+};
 
 const addTodo = () => {
   const todoText = todoInput.value.trim();
@@ -89,7 +120,7 @@ const addTodo = () => {
     const todo = {
       id: Date.now(),
       text: todoTextWithoutSpaces,
-      isCompleted: false
+      isCompleted: false,
     };
     todos.push(todo);
     renderTodo();
@@ -105,122 +136,91 @@ const addTodo = () => {
   sliceTodos();
   pushFront();
   renderTodo();
-}
+};
 
 const addTodoByEnter = (event) => {
   if (event.key === KEYDOWN_ENTER) {
     addTodo();
   }
-}
+};
 
 const saveTodoText = (event, itemKey) => {
   const todoTextWithoutSpaces = escapeHTML(event.target.value.replace(/^\s+|\s+$/g, ''));
   todos.forEach((todo) => {
-    if (todo.id === parseInt(itemKey, 10) && todoTextWithoutSpaces) {
+    if (todo.id === +itemKey && todoTextWithoutSpaces) {
       todo.text = todoTextWithoutSpaces;
     }
   });
-}
+};
 
-const returnBack = () => {
-  const currentTodo = openTab();
-  const countOfPages = Math.ceil(currentTodo.length / COUNT_OF_TODO_ON_PAGE);
-  if (currentPage > countOfPages && currentPage > 1) {
-    currentPage -= 1;
+const handleClick = (event) => {
+  const itemKey = event.target.parentElement.dataset.id;
+  if (event.target.type === 'submit') {
+    todos = todos.filter((todo) => todo.id !== +itemKey);
+    returnBack();
     renderTodo();
   }
-}
-
-const pushFront = () => {
-  const currentTodo = openTab();
-  const countOfPages = Math.ceil(currentTodo.length / COUNT_OF_TODO_ON_PAGE);
-  if (currentPage < countOfPages) {
-    currentPage += 1;
+  if (event.target.type === 'checkbox') {
+    todos.forEach((todo) => {
+      if (todo.id === +itemKey) {
+        todo.isCompleted = event.target.checked;
+      }
+    });
+    returnBack();
     renderTodo();
   }
-}
+  if (event.detail === DOUBLE_CLICK && event.target.tagName === 'SPAN') {
+    event.target.previousElementSibling.hidden = false;
+    event.srcElement.hidden = true;
+  }
+  countTodo();
+};
 
-const countTodo = () => {
-  const all = todos.length;
-  const completed = todos.filter((todo) => todo.isCompleted).length;
-  const active = all - completed;
-
-  tabButtons[INDEX_OF_ALL_TAB].textContent = `All(${all})`;
-  tabButtons[INDEX_OF_ACTIVE_TAB].textContent = `Active(${active})`;
-  tabButtons[INDEX_OF_COMPLETED_TAB].textContent = `Completed(${completed})`;
-}
-
-const setColor = () => {
-  tabButtons.forEach((tab) =>{
-    tab.style.backgroundColor = 'black';
+const handleCheckAllTodo = (event) => {
+  todos.forEach((todo) => {
+    todo.isCompleted = event.target.checked;
   });
-}
+  countTodo();
+  renderTodo();
+};
 
-const openTab = () => {
-  setColor();
+const handleDeleteAllCheckedTodo = () => {
+  checkAll.checked = false;
+  todos = todos.filter((todo) => !todo.isCompleted);
+  countTodo();
+  renderTodo(todos);
+};
 
-  if (filterType === 'active') {
-    tabButtons[INDEX_OF_ACTIVE_TAB].style.backgroundColor = 'red';
-    return todos.filter((todo) => !todo.isCompleted);
+const handleBlur = (event) => {
+  const itemKey = event.target.parentElement.dataset.id;
+  if (event.sourceCapabilities) {
+    saveTodoText(event, itemKey);
+    renderTodo();
   }
-  if (filterType === 'completed') {
-    tabButtons[INDEX_OF_COMPLETED_TAB].style.backgroundColor = 'red';
-    return todos.filter((todo) => todo.isCompleted);
+};
+
+const handleKeydownClick = (event) => {
+  if (event.key === KEYDOWN_ESCAPE) {
+    renderTodo();
   }
-
-  tabButtons[INDEX_OF_ALL_TAB].style.backgroundColor = 'red';
-  return todos;
-}
-
-const sliceTodos = () => {
-  const filterTodo = openTab();
-  const end = currentPage * COUNT_OF_TODO_ON_PAGE;
-  const start = end - COUNT_OF_TODO_ON_PAGE;
-  return filterTodo.slice(start, end);
-}
-
-const createPaginationButtons = () => {
-  let listPages = '';
-  const currentTodo = openTab();
-  const countOfPages = Math.ceil(currentTodo.length / COUNT_OF_TODO_ON_PAGE);
-  for (let i = 1; i <= countOfPages; i++) {
-    listPages += `<button id="${i}" class="tab-links-pagination ${currentPage === i ? 'active' : '' }" 
-        style="border-radius: 50%; width: 50px; height: 50px; margin: 0 5px 25px;">${i}</button>`;
+  const itemKey = event.target.parentElement.dataset.id;
+  if (event.key === KEYDOWN_ENTER) {
+    saveTodoText(event, itemKey);
+    renderTodo();
   }
-  paginationList.innerHTML = listPages;
-}
+};
 
 const generateContent = (event) => {
   if (event.target.tagName === 'BUTTON') {
-    currentPage = parseInt(event.target.id, 10);
+    currentPage = +event.target.id;
     renderTodo();
   }
-}
-
-const renderTodo = () => {
-  let listItems = '';
-  const todosForRender = sliceTodos();
-
-  todosForRender.forEach((todo) => {
-    listItems += `<li data-id="${todo.id}" class="list-group-item" >
-            <input type="checkbox" ${todo.isCompleted ? 'checked' : ''} />
-            <input class="text-on-todo-hidden" value="${todo.text}" hidden/>
-            <span class="text-on-todo">${todo.text}</span>
-            <button class="delete-todo">✗</button>
-            </li>`;
-  });
-
-  todoList.innerHTML = listItems;
-
-  createPaginationButtons();
-  handleConfirmIsAllCheck();
-  returnBack();
-}
+};
 
 const switchFilterType = (event) => {
   filterType = event.target.id;
   renderTodo();
-}
+};
 
 todoInput.addEventListener('keydown', addTodoByEnter);
 addTodoBtn.addEventListener('click', addTodo);
