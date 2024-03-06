@@ -29,8 +29,6 @@ const setColor = () => {
 };
 
 const openTab = () => {
-  setColor();
-
   if (filterType === 'active') {
     return todos.filter((todo) => !todo.isCompleted);
   }
@@ -53,7 +51,8 @@ const createPaginationButtons = () => {
   const currentTodo = openTab();
   const countOfPages = Math.ceil(currentTodo.length / COUNT_OF_TODO_ON_PAGE);
   for (let i = 1; i <= countOfPages; i += 1) {
-    listPages += `<button id="${i}" class="tab-links-pagination ${currentPage === i ? 'active' : ''}">${i}</button>`;
+    listPages += `
+    <button id="${i}" class="tab-links-pagination ${currentPage === i ? 'active' : ''}">${i}</button>`;
   }
   paginationList.innerHTML = listPages;
 };
@@ -73,6 +72,8 @@ const handleConfirmIsAllCheck = () => {
 };
 
 const renderTodo = () => {
+  countTodo();
+  returnBack();
   let listItems = '';
   const todosForRender = sliceTodos();
 
@@ -89,7 +90,6 @@ const renderTodo = () => {
 
   createPaginationButtons();
   handleConfirmIsAllCheck();
-  returnBack();
 };
 
 const returnBack = () => {
@@ -120,19 +120,17 @@ const addTodo = () => {
       isCompleted: false,
     };
     todos.push(todo);
-    renderTodo();
+    setColor();
     todoInput.value = '';
+    countTodo();
+    filterType = 'all';
+    const currentTodo = openTab();
+    const countOfPages = Math.ceil(currentTodo.length / COUNT_OF_TODO_ON_PAGE);
+    currentPage = countOfPages;
+    sliceTodos();
+    pushFront();
+    renderTodo();
   }
-  countTodo();
-  filterType = 'all';
-
-  const currentTodo = openTab();
-  const countOfPages = Math.ceil(currentTodo.length / COUNT_OF_TODO_ON_PAGE);
-  currentPage = countOfPages;
-
-  sliceTodos();
-  pushFront();
-  renderTodo();
 };
 
 const addTodoByEnter = (event) => {
@@ -148,13 +146,14 @@ const saveTodoText = (event, itemKey) => {
       todo.text = todoTextWithoutSpaces;
     }
   });
+  renderTodo();
 };
 
 const handleClick = (event) => {
   const itemKey = event.target.parentElement.dataset.id;
   if (event.target.type === 'submit') {
     todos = todos.filter((todo) => todo.id !== Number(itemKey));
-    returnBack(renderTodo());
+    renderTodo();
   }
   if (event.target.type === 'checkbox') {
     todos.forEach((todo) => {
@@ -162,7 +161,7 @@ const handleClick = (event) => {
         todo.isCompleted = event.target.checked;
       }
     });
-    returnBack(renderTodo());
+    renderTodo();
   }
   if (event.detail === DOUBLE_CLICK && event.target.tagName === 'SPAN') {
     event.target.previousElementSibling.hidden = false;
@@ -175,19 +174,19 @@ const handleCheckAllTodo = (event) => {
   todos.forEach((todo) => {
     todo.isCompleted = event.target.checked;
   });
-  countTodo(renderTodo());
+  renderTodo();
 };
 
 const handleDeleteAllCheckedTodo = () => {
   checkAll.checked = false;
   todos = todos.filter((todo) => !todo.isCompleted);
-  countTodo(renderTodo());
+  renderTodo();
 };
 
 const handleBlur = (event) => {
   const itemKey = event.target.parentElement.dataset.id;
   if (event.sourceCapabilities) {
-    saveTodoText(event, itemKey, renderTodo());
+    saveTodoText(event, itemKey);
   }
 };
 
@@ -197,7 +196,7 @@ const handleKeydownClick = (event) => {
   }
   const itemKey = event.target.parentElement.dataset.id;
   if (event.key === KEYDOWN_ENTER) {
-    saveTodoText(event, itemKey, renderTodo());
+    saveTodoText(event, itemKey);
   }
 };
 
