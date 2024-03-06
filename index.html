@@ -8,27 +8,27 @@
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <div class="container">
       <h1>TodoJS App</h1>
-        <div id="input">
-            <input id="todoInput" placeholder="Add a new todo" />
-            <button id="addTodo">Add</button>
-        </div>
-        <div>
-            <input id="checkAll" type="checkBox">
-            <span>check all</span>
-        </div>
-      <ul id="todoList" class="list-group mt-3"></ul>
-      <div id="tabGroups" class="tab-groups">
+      <div id="input">
+        <input id="todo-input" placeholder="Add a new todo" />
+        <button id="add-todo">Add</button>
+      </div>
+      <div>
+        <input id="check-all" type="checkBox">
+        <span>check all</span>
+      </div>
+      <ul id="todo-list" class="list-group mt-3"></ul>
+      <div id="tab-groups" class="tab-groups">
         <button id="all" class="tab-links">All(0)</button>
         <button id="active" class="tab-links">Active(0)</button>
         <button id="completed" class="tab-links">Completed(0)</button>
       </div>
-      <div id="paginationList" class="tab-links-pagination"></div>
-      <button id="deleteAll" class="delete-all" >Delete all completed</button>
+      <div id="pagination-list" class="tab-links-pagination"></div>
+      <button id="delete-all" class="delete-all">Delete all completed</button>
     </div>
     <script src="app.js"></script>
   </body>

@@ -46,6 +46,10 @@ h1 {
 .tab-links-pagination {
   background-color: black;
   color: white;
+  border-radius: 50%; 
+  width: 50px; 
+  height: 50px; 
+  margin: 0 5px 25px;
 }
 
 .active {
@@ -73,34 +77,33 @@ h1 {
   width: 850px;
 }
 
+.tab-links {
+  border: none;
+  background-color: black;
+  color: white;
+  margin-bottom: 25px;
+}
+
+.active-colored {
+background-color: red;
+color: white;
+}
+
+#todo-list {
+  margin-bottom: 25px;
+}
+
 #input {
   margin-bottom: 25px;
 }
 
-#paginationList {
+#pagination-list {
   background-color: transparent;
+  width: max-content;
 }
 
-#addTodo {
+#add-todo {
   background-color: black;
   color: white;
   border: none;
-}
-
-#tabGroups .tab-links {
-  border: none;
-  background-color: black;
-  color: white;
-  margin-bottom: 25px;
-}
-
-#tabGroups .tab-links-a {
-  border: none;
-  background-color: red;
-  color: white;
-  margin-bottom: 25px;
-}
-
-#todoList {
-  margin-bottom: 25px;
 }

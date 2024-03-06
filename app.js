@@ -3,14 +3,14 @@ const KEYDOWN_ESCAPE = 'Escape';
 const KEYDOWN_ENTER = 'Enter';
 const COUNT_OF_TODO_ON_PAGE = 5;
 
-const todoInput = document.querySelector('#todoInput');
-const addTodoBtn = document.querySelector('#addTodo');
-const todoList = document.querySelector('#todoList');
-const checkAll = document.querySelector('#checkAll');
-const deleteAllChecked = document.querySelector('#deleteAll');
-const tabButtons = document.querySelectorAll('#tabGroups .tab-links');
-const tabulation = document.querySelector('#tabGroups');
-const paginationList = document.querySelector('#paginationList');
+const todoInput = document.querySelector('#todo-input');
+const addTodoBtn = document.querySelector('#add-todo');
+const todoList = document.querySelector('#todo-list');
+const checkAll = document.querySelector('#check-all');
+const deleteAllChecked = document.querySelector('#delete-all');
+const tabButtons = document.querySelectorAll('#tab-groups .tab-links');
+const tabulation = document.querySelector('#tab-groups');
+const paginationList = document.querySelector('#pagination-list');
 
 let todos = [];
 let filterType = 'all';
@@ -20,13 +20,10 @@ const escapeHTML = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').r
   .replace(/'/g, '&#039;');
 
 const setColor = () => {
-  // tabButtons.forEach((tab) => {
-  //   tab.style.backgroundColor = 'black';
-  // });
   tabButtons.forEach((button) => {
-    button.classList.remove('tab-links');
+    button.classList.remove('active-colored');
     if (button.id === filterType) {
-      button.classList.add('tab-links-a');
+      button.classList.add('active-colored');
     }
   });
 };
@@ -56,8 +53,7 @@ const createPaginationButtons = () => {
   const currentTodo = openTab();
   const countOfPages = Math.ceil(currentTodo.length / COUNT_OF_TODO_ON_PAGE);
   for (let i = 1; i <= countOfPages; i += 1) {
-    listPages += `<button id="${i}" class="tab-links-pagination ${currentPage === i ? 'active' : ''}"
-  style="border-radius: 50%; width: 50px; height: 50px; margin: 0 5px 25px;">${i}</button>`;
+    listPages += `<button id="${i}" class="tab-links-pagination ${currentPage === i ? 'active' : ''}">${i}</button>`;
   }
   paginationList.innerHTML = listPages;
 };
@@ -67,9 +63,9 @@ const countTodo = () => {
   const completed = todos.filter((todo) => todo.isCompleted).length;
   const active = all - completed;
 
-  tabButtons[0].innerText = `All(${all})`;
-  tabButtons[1].innerText = `Active(${active})`;
-  tabButtons[2].innerText = `Completed(${completed})`;
+  tabButtons[0].textContent = `All(${all})`;
+  tabButtons[1].textContent = `Active(${active})`;
+  tabButtons[2].textContent = `Completed(${completed})`;
 };
 
 const handleConfirmIsAllCheck = () => {
@@ -81,12 +77,13 @@ const renderTodo = () => {
   const todosForRender = sliceTodos();
 
   todosForRender.forEach((todo) => {
-    listItems += `<li data-id="${todo.id}" class="list-group-item" >
-                    <input type="checkbox" ${todo.isCompleted ? 'checked' : ''} />
-                    <input class="text-on-todo-hidden" value="${todo.text}" hidden/>
-                    <span class="text-on-todo">${todo.text}</span>
-                    <button class="delete-todo">✗</button>
-                  </li>`;
+    listItems += `
+    <li data-id="${todo.id}" class="list-group-item" >
+      <input type="checkbox" ${todo.isCompleted ? 'checked' : ''} />
+      <input class="text-on-todo-hidden" value="${todo.text}" hidden/>
+      <span class="text-on-todo">${todo.text}</span>
+      <button class="delete-todo">✗</button>
+    </li>`;
   });
   todoList.innerHTML = listItems;
 
@@ -147,7 +144,7 @@ const addTodoByEnter = (event) => {
 const saveTodoText = (event, itemKey) => {
   const todoTextWithoutSpaces = escapeHTML(event.target.value.replace(/^\s+|\s+$/g, ''));
   todos.forEach((todo) => {
-    if (todo.id === +itemKey && todoTextWithoutSpaces) {
+    if (todo.id === Number(itemKey) && todoTextWithoutSpaces) {
       todo.text = todoTextWithoutSpaces;
     }
   });
@@ -156,18 +153,16 @@ const saveTodoText = (event, itemKey) => {
 const handleClick = (event) => {
   const itemKey = event.target.parentElement.dataset.id;
   if (event.target.type === 'submit') {
-    todos = todos.filter((todo) => todo.id !== +itemKey);
-    returnBack();
-    renderTodo();
+    todos = todos.filter((todo) => todo.id !== Number(itemKey));
+    returnBack(renderTodo());
   }
   if (event.target.type === 'checkbox') {
     todos.forEach((todo) => {
-      if (todo.id === +itemKey) {
+      if (todo.id === Number(itemKey)) {
         todo.isCompleted = event.target.checked;
       }
     });
-    returnBack();
-    renderTodo();
+    returnBack(renderTodo());
   }
   if (event.detail === DOUBLE_CLICK && event.target.tagName === 'SPAN') {
     event.target.previousElementSibling.hidden = false;
@@ -180,22 +175,19 @@ const handleCheckAllTodo = (event) => {
   todos.forEach((todo) => {
     todo.isCompleted = event.target.checked;
   });
-  countTodo();
-  renderTodo();
+  countTodo(renderTodo());
 };
 
 const handleDeleteAllCheckedTodo = () => {
   checkAll.checked = false;
   todos = todos.filter((todo) => !todo.isCompleted);
-  countTodo();
-  renderTodo(todos);
+  countTodo(renderTodo());
 };
 
 const handleBlur = (event) => {
   const itemKey = event.target.parentElement.dataset.id;
   if (event.sourceCapabilities) {
-    saveTodoText(event, itemKey);
-    renderTodo();
+    saveTodoText(event, itemKey, renderTodo());
   }
 };
 
@@ -205,21 +197,23 @@ const handleKeydownClick = (event) => {
   }
   const itemKey = event.target.parentElement.dataset.id;
   if (event.key === KEYDOWN_ENTER) {
-    saveTodoText(event, itemKey);
-    renderTodo();
+    saveTodoText(event, itemKey, renderTodo());
   }
 };
 
 const generateContent = (event) => {
   if (event.target.tagName === 'BUTTON') {
-    currentPage = +event.target.id;
+    currentPage = Number(event.target.id);
     renderTodo();
   }
 };
 
 const switchFilterType = (event) => {
-  filterType = event.target.id;
-  renderTodo();
+  if (event.target.tagName === 'BUTTON') {
+    filterType = event.target.id;
+    renderTodo();
+    setColor();
+  }
 };
 
 todoInput.addEventListener('keydown', addTodoByEnter);
