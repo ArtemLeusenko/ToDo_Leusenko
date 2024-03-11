@@ -58,8 +58,13 @@ h1 {
 }
 
 .text-on-todo {
+  width: 100%; 
+  height: 100%; 
+  display: flex;
   margin-left: 20px;
+  align-items: start;
   word-break: break-all;
+  justify-content: start;
 }
 
 .text-on-todo-hidden {

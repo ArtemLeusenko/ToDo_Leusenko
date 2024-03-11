@@ -17,8 +17,8 @@ let filterType = 'all';
 let currentPage = 1;
 
 const escapeHTML = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-  .replace(/'/g, '&#039;');
-
+  .replace(/'/g, '&#039;')
+  .replace(/\s{2,}/g, ' ');
 const setColor = () => {
   tabButtons.forEach((button) => {
     button.classList.remove('active-colored');
@@ -81,7 +81,7 @@ const renderTodo = () => {
     listItems += `
     <li data-id="${todo.id}" class="list-group-item" >
       <input type="checkbox" ${todo.isCompleted ? 'checked' : ''} />
-      <input class="text-on-todo-hidden" value="${todo.text}" hidden/>
+      <input class="text-on-todo-hidden" maxlength="250" value="${todo.text}" hidden/>
       <span class="text-on-todo">${todo.text}</span>
       <button class="delete-todo">✗</button>
     </li>`;
@@ -120,7 +120,6 @@ const addTodo = () => {
       isCompleted: false,
     };
     todos.push(todo);
-    setColor();
     todoInput.value = '';
     countTodo();
     filterType = 'all';
@@ -130,6 +129,7 @@ const addTodo = () => {
     sliceTodos();
     pushFront();
     renderTodo();
+    setColor();
   }
 };
 
@@ -164,8 +164,10 @@ const handleClick = (event) => {
     renderTodo();
   }
   if (event.detail === DOUBLE_CLICK && event.target.tagName === 'SPAN') {
-    event.target.previousElementSibling.hidden = false;
-    event.srcElement.hidden = true;
+    const textElement = event.target.previousElementSibling;
+    textElement.hidden = false;
+    event.target.hidden = true;
+    textElement.focus();
   }
   countTodo();
 };
